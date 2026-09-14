@@ -1,0 +1,22 @@
+Package: mardist
+Type: Package
+Title: Calculation of Maritime Distances
+Version: 1.0.1
+Encoding: UTF-8
+Date: 2026-09-03
+Description: Tools and utilities for calculating distances and visualising maritime routes.
+License: EUPL
+Depends: R (>= 3.5)
+Imports: data.table, dplyr, leaflet, igraph
+LazyData: true
+Config/roxygen2/version: 8.1.0
+Authors@R: person(given = "Panayotis",
+                    family = "Christidis",
+                    role = c("cre", "aut"),
+                    email = "Panayotis.Christidis@ec.europa.eu")
+NeedsCompilation: no
+Packaged: 2026-09-04 13:47:20 UTC; chrisps@delta.europa.eu
+Author: Panayotis Christidis [cre, aut]
+Maintainer: Panayotis Christidis <Panayotis.Christidis@ec.europa.eu>
+Repository: CRAN
+Date/Publication: 2026-09-14 15:30:02 UTC

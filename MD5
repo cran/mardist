@@ -1,0 +1,17 @@
+c9ca1d6f51ae5ba50fc831d6978a9d76 *DESCRIPTION
+002e2af59f57333bccaef7e16b4ded42 *NAMESPACE
+b90afee3289023946fe891a25000a619 *NEWS.md
+da48b6189c704752e25dfd3808246bea *R/data.R
+422f44c2459a767eeeb110002881dc16 *R/global.R
+1302583335e2c57dd0658ac29ce8f07f *R/imports.R
+7c6b37b1cd7d48ddedf0afb70f463f40 *R/mardist.R
+8450fc3e5204862cb759a4ddf06fa30f *R/route_wrapper.R
+f153962a63e52e2d103a7331255cf9a2 *data/cluster_coordinates.rda
+ba1a50f6ecac54173541dc93a1e0d21c *data/network.rda
+47b7be655ee36f580a961bb77e8f6333 *man/cluster_coordinates.Rd
+02882ae60260891335631a81292f5b50 *man/distance_route.Rd
+95d0a341335d028e712704f3eb449685 *man/dtHaversine.Rd
+9161080168821f23ef7b070bd82ca6c6 *man/multi_route_map.Rd
+9a960fc191288afb5073e70c95436a79 *man/multi_route_map_network.Rd
+fb52125b1219b428aa5e1321b8698472 *man/network.Rd
+761eb512dcbe67dfa7673b80ce620a53 *man/route_map.Rd
