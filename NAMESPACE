@@ -2,6 +2,7 @@
 
 export(distance_route)
 export(dtHaversine)
+export(multi_point_route)
 export(multi_route_map)
 export(multi_route_map_network)
 export(route_map)

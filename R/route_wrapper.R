@@ -20,5 +20,6 @@ route_map <- function(lon1, lat1, lon2, lat2) {
     extra_distance = 0L
   )
   ## `rr[[1]]` is the data.table that `map_route` works with.
-  map_route(list(rr[[1]], NA))
+  #map_route(list(rr[[1]], NA))
+  map_route(list(rr[[1]],rr[[2]]))
 }

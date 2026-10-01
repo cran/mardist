@@ -69,12 +69,8 @@ find_route <- function(graph, V1, V2, extra_distance) {
     route$distance <- round(route$distance / 1852, 1) # convert into nautical miles
     distance <- 10 * round((sum(route$distance, na.rm = T) + extra_distance) / 10, 0)
 
-    if (distance < 30) {
-      distance <- 30
-    }
-  } else {
-    distance <- 30
-  }
+    if (distance < 30) {distance <- 30}
+  } else {distance <- 30}
 
   return(list(route, distance))
 }
@@ -102,9 +98,8 @@ map_route <- function(x) {
   }
 
   route_map <- route_map %>%
-    leaflet::addCircleMarkers(lng = route$lon[1], lat = route$lat[1]) %>%
-    leaflet::addCircleMarkers(lng = route$lon[nrow(route)], lat = route$lat[nrow(route)], color = "Red") %>%
-    leaflet::addPopups(lng = mean(route$lon, na.rm = T), lat = mean(route$lat, na.rm = T), popup = (as.character(paste(x[[2]], "nautical miles", sep = " "))))
+    leaflet::addCircleMarkers(lng = route$lon[1], lat = route$lat[1], popup = FALSE) %>%
+    leaflet::addCircleMarkers(lng = route$lon[nrow(route)], lat = route$lat[nrow(route)], color = "Red", popup = FALSE)
 
   return(route_map)
 }
@@ -185,8 +180,6 @@ multi_route_map <- function(lon1, lat1, clist) {
     route_map <- leaflet::leaflet()
 
     for (k in 1:nrow(clist)) {
-      # point_1=find_closest_cluster(origin[1],origin[2])
-      # point_2=find_closest_cluster(destination[1],destination[2])
       point_1 <- find_closest_cluster(lon1, lat1)
       point_2 <- find_closest_cluster(clist$lon[k], clist$lat[k])
 
@@ -215,9 +208,8 @@ multi_route_map <- function(lon1, lat1, clist) {
 
       route_map <- route_map %>%
         addTiles() %>%
-        addCircleMarkers(lng = route$lon[1], lat = route$lat[1]) %>%
-        addCircleMarkers(lng = route$lon[nrow(route)], lat = route$lat[nrow(route)], color = "Red") %>%
-        addPopups(lng = route$lon[nrow(route)], lat = route$lat[nrow(route)], options = popupOptions(closeButton = FALSE, minWidth = 1), popup = (as.character(paste(round(sum(route$distance, na.rm = T) / 10, 0) * 10, "nm", sep = " "))))
+        addCircleMarkers(lng = route$lon[1], lat = route$lat[1], popup = FALSE) %>%
+        addCircleMarkers(lng = route$lon[nrow(route)], lat = route$lat[nrow(route)], color = "Red", popup = FALSE)
     }
     return(route_map)
   })
@@ -262,29 +254,75 @@ multi_route_map_network <- function(clist) {
       point_1 <- find_closest_cluster(clist$longitude.x[k], clist$latitude.x[k])
       point_2 <- find_closest_cluster(clist$longitude.y[k], clist$latitude.y[k])
       if (point_1 == point_2) {} else {
-        # distance_1=as.numeric(dtHaversine(dt$lat[dt$V==point_1], dt$lon[dt$V==point_1], lat1,lon1)/1000/1.852)
-        # distance_2=as.numeric(dtHaversine(dt$lat[dt$V==point_2], dt$lon[dt$V==point_2], clist$lat[k],clist$lon[k])/1000/1.852)
-        # extra_distance<-distance_1+distance_2
-        # route=find_route(gg,point_1,point_2,extra_distance)[[1]]
-
-
         route <- find_route(gg, point_1, point_2, 0)[[1]]
-
         route <- route[!is.na(route$lon_1), ]
-        # route$lon<-route$lon + rnorm(nrow(route),0,0.1) # adding some noise to simulate line width
-        # route$lat<-route$lat + rnorm(nrow(route),0,0.1) # adding some noise to simulate line width
         route$lon[route$lon_1 > 100 & route$lon < (-100)] <- 179
         route$lon[route$lon_1 < (-100) & route$lon > 100] <- (-179)
-        #
 
 
-        # route_map <- route_map %>%
         for (i in 1:nrow(route)) {
           route_map <- route_map %>%
             addPolylines(
               lng = c(route$lon[i], route$lon_1[i]),
               lat = c(route$lat[i], route$lat_1[i],
                 weight = 0.1
+              )
+            )
+        }
+      } # if point 1==point2
+    }
+    route_map <- route_map %>%
+      addTiles()
+
+    return(route_map)
+  })
+}
+
+
+
+#' Map a continues route that passes through specific points
+#'
+#' Given a data frame / data.table (`clist`) that contains a list of
+#' coordinates, the function draws a **leaflet** map with the
+#' shortest route line that connects the points in thelist.  The function is useful for
+#' visualising a full route that passes from specific points (e.g. all vessel port calls
+#' during a certain period).
+#'
+#' @param clist A data.frame or data.table that must contain **two**
+#'   columns with the exact names `longitude` and `latitude`.  Any additional
+#'   columns are ignored.
+#'
+#' @return An object of class **`leaflet`** that displays all of the
+#'   shortest maritime routes contained in `clist`.
+#'
+#' @examples
+#' ## A multi-port route:
+#' routes <- data.frame(cbind(
+#' longitude=c(120,122,90,60,30,25,0,8),
+#' latitude=c(30,31,40,32,40,34,34,55)))
+#' multi_point_route(routes)
+#'
+#' @export
+multi_point_route <- function(clist) {
+  suppressWarnings({
+    route_map <- leaflet()
+
+    for (k in 1:(nrow(clist)-1)) {
+      point_1 <- find_closest_cluster(clist$longitude[k], clist$latitude[k])
+      point_2 <- find_closest_cluster(clist$longitude[k+1], clist$latitude[k+1])
+      if (point_1 == point_2) {} else {
+        route <- find_route(gg, point_1, point_2, 0)[[1]]
+        route <- route[!is.na(route$lon_1), ]
+        route$lon[route$lon_1 > 100 & route$lon < (-100)] <- 179
+        route$lon[route$lon_1 < (-100) & route$lon > 100] <- (-179)
+
+
+        for (i in 1:nrow(route)) {
+          route_map <- route_map %>%
+            addPolylines(
+              lng = c(route$lon[i], route$lon_1[i]),
+              lat = c(route$lat[i], route$lat_1[i],
+                      weight = 0.1
               )
             )
         }
